@@ -29,7 +29,6 @@ public class productServiceImp implements productService {
     @Override
     public Product searchProduct(Integer Id) {
         return inventory.stream().filter(product -> product.getProductId()==Id).toList().getFirst();
-        //return inventory.get(Id);
     }
 
     @Override
@@ -38,31 +37,27 @@ public class productServiceImp implements productService {
     }
 
     @Override
-    public Boolean modifyProduct(Integer productId, String productName, String productCategory, Float productPrice, LocalDateTime productExpirationDate, Integer productQuantityStock) {
+    public Boolean modifyProduct(Integer productId, Product uProduct) {
         Product product = searchProduct(productId);
         Boolean modified = false;
-        if(!Objects.equals(productName, product.getProductName())){
-            product.setProductName(productName);
+        if(!Objects.equals(uProduct.getProductName(), product.getProductName())){
+            product.setProductName(uProduct.getProductName());
             modified = true;
         }
-        if(!Objects.equals(productCategory, product.getProductCategory())){
-            product.setProductCategory(productCategory);
+        if(!Objects.equals(uProduct.getProductCategory(), product.getProductCategory())){
+            product.setProductCategory(uProduct.getProductCategory());
             modified = true;
         }
-        if(!Objects.equals(productPrice, product.getProductPrice())){
-            product.setProductPrice(productPrice);
+        if(!Objects.equals(uProduct.getProductPrice(), product.getProductPrice())){
+            product.setProductPrice(uProduct.getProductPrice());
             modified = true;
         }
-        if(productExpirationDate != product.getProductExpirationDate()){
-            product.setProductExpirationDate(productExpirationDate);
+        if(uProduct.getProductExpirationDate() != product.getProductExpirationDate()){
+            product.setProductExpirationDate(uProduct.getProductExpirationDate());
             modified = true;
         }
-        if(productName != product.getProductName()){
-            product.setProductName(productName);
-            modified = true;
-        }
-        if(productQuantityStock != product.getProductQuantityStock()){
-            product.setProductQuantityStock(productQuantityStock);
+        if(uProduct.getProductQuantityStock() != product.getProductQuantityStock()){
+            product.setProductQuantityStock(uProduct.getProductQuantityStock());
             modified = true;
         }
         if(modified){
@@ -93,9 +88,8 @@ public class productServiceImp implements productService {
     }
 
     @Override
-    public List<Product> getFilteredProducts(Integer criteria) {
-        return inventory;
-        //return inventory.values().stream().filter(product -> Objects.equals(product.getProductCategory(), criteria.toString())).toList();
+    public List<Product> getFilteredProducts(String criteria) {
+        return inventory.stream().filter(product -> Objects.equals(product.getProductCategory(), criteria)).toList();
     }
 
 }
