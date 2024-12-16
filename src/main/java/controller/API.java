@@ -4,6 +4,7 @@ import lombok.*;
 import model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import services.productServiceImp;
 
@@ -29,29 +30,25 @@ public class API {
     }
 
     @PostMapping("/products")
-    public void postProduct(@RequestBody Product product){
-        if(product.getProductCategory()!= null && product.getProductPrice()!= null && product.getProductQuantityStock()!= null){
-            productServiceImp.addProducts(product);
-        }
-        else{
+    public void postProduct(@Validated @RequestBody Product product){
+        productServiceImp.addProducts(product);
 
-        }
     }
 
     @PutMapping("/products/{id}")
-    public void updateProduct(@RequestParam Integer productId, @RequestParam String productName, @RequestParam String productCategory, @RequestParam Float productPrice, @RequestParam LocalDateTime productExpirationDate, @RequestParam Integer productQuantityStock){
+    public void updateProduct(@Validated @RequestParam Integer productId, @RequestParam String productName, @RequestParam String productCategory, @RequestParam Float productPrice, @RequestParam LocalDateTime productExpirationDate, @RequestParam Integer productQuantityStock){
         productServiceImp.modifyProduct(productId,productName,productCategory,productPrice,productExpirationDate,productQuantityStock);
     }
 
 
     @PostMapping("/products/{id}/outofstock")
-    public void outOfStockProduct(@RequestParam Integer productId){
+    public void outOfStockProduct(@Validated @RequestParam Integer productId){
         productServiceImp.outOfStockProduct(productId);
     }
 
 
     @PutMapping("/products/{id}/instock")
-    public void inStockProduct(@RequestParam Integer productId, @RequestParam Integer productQuantityStock){
+    public void inStockProduct(@Validated @RequestParam Integer productId, @RequestParam Integer productQuantityStock){
         if (productQuantityStock!=0){
             productServiceImp.reStockProduct(productId,productQuantityStock);
         }
@@ -60,7 +57,7 @@ public class API {
         }
     }
     @DeleteMapping("/products/{id}/delete")
-    public Boolean deleteProduct(@RequestParam Integer productId){
+    public Boolean deleteProduct(@Validated @RequestParam Integer productId){
         return productServiceImp.deleteProduct(productId);
     }
 }

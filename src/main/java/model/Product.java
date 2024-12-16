@@ -1,16 +1,32 @@
 package model;
-import lombok.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 
 public class Product {
+    @NotNull
     private Integer productId;
+    @NotNull
+    @NotBlank
+    @Size(min = 2, message = "{validation.name.size.too_short}")
+    @Size(max = 120, message = "{validation.name.size.too_long}")
     private String productName;
+    @NotNull
+    @NotBlank
     private String productCategory;
+    @NotNull
+    @NotBlank
+    @Positive
     private Float productPrice;
+    @NotNull
     private LocalDateTime productExpirationDate;
+    @NotNull
+    @NotBlank
+    @Positive
     private Integer productQuantityStock;
+    @NotNull
     private LocalDateTime productCreationDate;
+    @NotNull
     private LocalDateTime productUpdateDate;
     public Product(Integer productId, String productName, String productCategory, Float productPrice, LocalDateTime productExpirationDate, Integer productQuantityStock, LocalDateTime productCreationDate, LocalDateTime productUpdateDate) {
         this.productId = productId;
