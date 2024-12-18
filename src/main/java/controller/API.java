@@ -15,7 +15,7 @@ import java.util.List;
 import model.Product;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/inventory")
+@RequestMapping("/")
 public class API {
 
     @Autowired

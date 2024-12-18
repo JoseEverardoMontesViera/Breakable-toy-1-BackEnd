@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 
 public class Product {
-    @NotNull
     private Integer productId;
     @NotNull
     @NotBlank

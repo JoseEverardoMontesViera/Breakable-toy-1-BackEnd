@@ -19,7 +19,7 @@ public class productServiceImp implements productService {
             product.setProductId(1);
         }
         else{
-            product.setProductId((inventory.get(inventory.size()-1).getProductId())+1);
+            product.setProductId((inventory.getLast().getProductId())+1);
         }
         product.setProductCreationDate(LocalDateTime.now());
         product.setProductUpdateDate(LocalDateTime.now());
@@ -28,7 +28,7 @@ public class productServiceImp implements productService {
 
     @Override
     public Product searchProduct(Integer Id) {
-        return inventory.stream().filter(product -> product.getProductId()==Id).toList().getFirst();
+        return inventory.stream().filter(product -> Objects.equals(product.getProductId(), Id)).toList().getFirst();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class productServiceImp implements productService {
             product.setProductExpirationDate(uProduct.getProductExpirationDate());
             modified = true;
         }
-        if(uProduct.getProductQuantityStock() != product.getProductQuantityStock()){
+        if(!Objects.equals(uProduct.getProductQuantityStock(), product.getProductQuantityStock())){
             product.setProductQuantityStock(uProduct.getProductQuantityStock());
             modified = true;
         }
