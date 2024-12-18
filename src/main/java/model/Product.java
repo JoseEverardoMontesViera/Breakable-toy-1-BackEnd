@@ -17,15 +17,15 @@ public class Product {
     @NotBlank
     @Positive
     private Float productPrice;
-    @NotNull
+    @Null
     private LocalDateTime productExpirationDate;
     @NotNull
     @NotBlank
     @Positive
     private Integer productQuantityStock;
-    @NotNull
+    @Null
     private LocalDateTime productCreationDate;
-    @NotNull
+    @Null
     private LocalDateTime productUpdateDate;
     public Product(Integer productId, String productName, String productCategory, Float productPrice, LocalDateTime productExpirationDate, Integer productQuantityStock, LocalDateTime productCreationDate, LocalDateTime productUpdateDate) {
         this.productId = productId;

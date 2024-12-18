@@ -1,5 +1,7 @@
 package controller;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.GsonBuilder;
 import lombok.*;
 import model.Product;
 import org.apache.coyote.Response;
@@ -8,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import services.LocalDateTimeTypeAdapter;
 import services.productServiceImp;
+import com.google.gson.Gson;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,8 +36,11 @@ public class API {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<?> postProduct(@Validated @RequestBody Product product){
-        productServiceImp.addProducts(product);
+    public ResponseEntity<?> postProduct(@RequestBody String product){
+        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .create();
+        Product newProduct = gson.fromJson(product, Product.class);
+        productServiceImp.addProducts(newProduct);
         return ResponseEntity.ok().body("The product has been added");
 
     }
