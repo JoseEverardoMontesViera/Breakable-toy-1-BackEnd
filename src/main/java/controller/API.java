@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import services.LocalDateTimeTypeAdapter;
 import services.productServiceImp;
 import com.google.gson.Gson;
-
+import org.json.JSONObject;
 import java.time.LocalDateTime;
 import java.util.List;
 import model.Product;
@@ -36,11 +36,20 @@ public class API {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<?> postProduct(@RequestBody String product){
-        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
-                .create();
-        Product newProduct = gson.fromJson(product, Product.class);
-        productServiceImp.addProducts(newProduct);
+    public ResponseEntity<?> postProduct(@RequestBody String newProduct){
+//        Product newProduct = new Product(0, productName, productCategory, productPrice, productExpirationDate, productQuantityStock);
+        JSONObject json = new JSONObject(newProduct);
+        System.out.println(json);
+
+        Product addingProduct = new Product();
+        addingProduct.setProductName(json.getString("productName"));
+        addingProduct.setProductCategory(json.getString("productCategory"));
+        addingProduct.setProductPrice(json.getFloat("productPrice"));
+        if(json.getString("productExpirationDate")!=null){
+            addingProduct.setProductExpirationDate(json.getString("productExpirationDate").toString());
+        }
+        addingProduct.setProductQuantityStock(json.getInt("productQuantityStock"));
+        productServiceImp.addProducts(addingProduct);
         return ResponseEntity.ok().body("The product has been added");
 
     }

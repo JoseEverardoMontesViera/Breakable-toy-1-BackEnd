@@ -18,7 +18,7 @@ public class Product {
     @Positive
     private Float productPrice;
     @Null
-    private LocalDateTime productExpirationDate;
+    private String productExpirationDate;
     @NotNull
     @NotBlank
     @Positive
@@ -27,15 +27,13 @@ public class Product {
     private LocalDateTime productCreationDate;
     @Null
     private LocalDateTime productUpdateDate;
-    public Product(Integer productId, String productName, String productCategory, Float productPrice, LocalDateTime productExpirationDate, Integer productQuantityStock, LocalDateTime productCreationDate, LocalDateTime productUpdateDate) {
+    public Product(Integer productId, String productName, String productCategory, Float productPrice, String productExpirationDate, Integer productQuantityStock) {
         this.productId = productId;
         this.productName = productName;
         this.productCategory = productCategory;
         this.productPrice = productPrice;
         this.productExpirationDate = productExpirationDate;
         this.productQuantityStock = productQuantityStock;
-        this.productCreationDate = productCreationDate;
-        this.productUpdateDate = productUpdateDate;
     }
 
     public Product() {
@@ -54,7 +52,7 @@ public class Product {
         return productQuantityStock;
     }
 
-    public LocalDateTime getProductExpirationDate() {
+    public String getProductExpirationDate() {
         return productExpirationDate;
     }
 
@@ -90,7 +88,7 @@ public class Product {
         this.productPrice = productPrice;
     }
 
-    public void setProductExpirationDate(LocalDateTime productExpirationDate) {
+    public void setProductExpirationDate(String productExpirationDate) {
         this.productExpirationDate = productExpirationDate;
     }
 
