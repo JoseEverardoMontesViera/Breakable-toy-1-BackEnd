@@ -1,8 +1,10 @@
 package services;
 import model.Product;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import model.Product;
@@ -12,18 +14,24 @@ public class productServiceImp implements productService {
 
     public List<Product> inventory = new ArrayList<>();
 
+    DateTimeFormatter formatter
+            = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd");
 
     @Override
-    public void addProducts(Product product) {
+    public Product addProducts(Product product) {
         if(inventory.isEmpty()){
             product.setProductId(1);
         }
         else{
             product.setProductId((inventory.getLast().getProductId())+1);
         }
-        product.setProductCreationDate(LocalDateTime.now());
-        product.setProductUpdateDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        String dateTimeString = now.format(formatter);
+        product.setProductCreationDate(dateTimeString);
+        product.setProductUpdateDate(dateTimeString);
         inventory.add(product);
+        return product;
     }
 
     @Override
@@ -61,7 +69,9 @@ public class productServiceImp implements productService {
             modified = true;
         }
         if(modified){
-            product.setProductUpdateDate(LocalDateTime.now());
+            LocalDateTime now = LocalDateTime.now();
+            String dateTimeString = now.format(formatter);
+            product.setProductUpdateDate(dateTimeString);
             return true;
         }
         else{
@@ -70,15 +80,17 @@ public class productServiceImp implements productService {
     }
 
     @Override
-    public void outOfStockProduct(Integer productId) {
+    public Boolean outOfStockProduct(Integer productId) {
         Product product = searchProduct(productId);
         product.setProductQuantityStock(0);
+        return true;
     }
 
     @Override
-    public void reStockProduct(Integer productId, Integer productQuantityStock) {
+    public Boolean reStockProduct(Integer productId) {
         Product product = searchProduct(productId);
-        product.setProductQuantityStock(productQuantityStock);
+        product.setProductQuantityStock(10);
+        return true;
     }
 
 

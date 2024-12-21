@@ -39,8 +39,6 @@ public class API {
     public ResponseEntity<?> postProduct(@RequestBody String newProduct){
 //        Product newProduct = new Product(0, productName, productCategory, productPrice, productExpirationDate, productQuantityStock);
         JSONObject json = new JSONObject(newProduct);
-        System.out.println(json);
-
         Product addingProduct = new Product();
         addingProduct.setProductName(json.getString("productName"));
         addingProduct.setProductCategory(json.getString("productCategory"));
@@ -50,57 +48,71 @@ public class API {
         }
         addingProduct.setProductQuantityStock(json.getInt("productQuantityStock"));
         productServiceImp.addProducts(addingProduct);
+
         return ResponseEntity.ok().body("The product has been added");
 
     }
 
     @PutMapping("/products/{id}")
-    public ResponseEntity<?> updateProduct(@Validated @RequestParam Integer productId, @RequestBody Product uProduct ){
-        if(productServiceImp.searchProduct(productId) == null){
+    public ResponseEntity<?> updateProduct(@Validated @PathVariable Integer id, @RequestBody String uProduct){
+        if(productServiceImp.searchProduct(id) == null){
+            System.out.println("No encontrado");
             return ResponseEntity.notFound().build();
         }
         else{
-            productServiceImp.modifyProduct(productId,uProduct);
-            return ResponseEntity.ok().body("Product with id: "+productId+" has been modified.");
+            JSONObject json = new JSONObject(uProduct);
+            System.out.println(json);
+            Product addingProduct = new Product();
+            addingProduct.setProductName(json.getString("productName"));
+            addingProduct.setProductCategory(json.getString("productCategory"));
+            addingProduct.setProductPrice(json.getFloat("productPrice"));
+            if(json.getString("productExpirationDate")!=null){
+                addingProduct.setProductExpirationDate(json.getString("productExpirationDate").toString());
+            }
+            addingProduct.setProductQuantityStock(json.getInt("productQuantityStock"));
+            productServiceImp.modifyProduct(id,addingProduct);
+            return ResponseEntity.ok().body("Product with id: "+id+" has been modified.");
         }
     }
 
 
     @PostMapping("/products/{id}/outofstock")
-    public ResponseEntity<?> outOfStockProduct(@Validated @RequestParam Integer productId){
-        if(productServiceImp.searchProduct(productId) == null){
+    public ResponseEntity<?> outOfStockProduct(@Validated @PathVariable Integer id){
+        if(productServiceImp.searchProduct(id) == null){
             return ResponseEntity.notFound().build();
         }
         else{
-            productServiceImp.outOfStockProduct(productId);
-            return ResponseEntity.ok().body("Product with id: "+productId+" has been marked as out of stock.");
+            productServiceImp.outOfStockProduct(id);
+            return ResponseEntity.ok().body("Product with id: "+id+" has been marked as out of stock.");
         }
     }
 
 
     @PutMapping("/products/{id}/instock")
-    public ResponseEntity<?> inStockProduct(@Validated @RequestBody Integer productId, @RequestBody Integer productQuantityStock){
-        if (productQuantityStock!=0){
-            if(productServiceImp.searchProduct(productId) == null){
+    public ResponseEntity<?> inStockProduct(@Validated @PathVariable Integer id){
+            Product product = productServiceImp.searchProduct(id);
+            if(product == null){
                 return ResponseEntity.notFound().build();
             }
             else{
-                productServiceImp.reStockProduct(productId,productQuantityStock);
-                return ResponseEntity.ok().body("Product with id: "+productId+" has been restocked.");
+                if (product.getProductQuantityStock()==0){
+                    productServiceImp.reStockProduct(id);
+                    return ResponseEntity.ok().body("Product with id: "+id+" has been restocked.");
+                }
+                else{
+                    return ResponseEntity.ok().body("That product already has a stock");
+                }
             }
-        }
-        else{
-            return ResponseEntity.badRequest().body("You can not restock 0 units on a product");
-        }
+
     }
     @DeleteMapping("/products/{id}/delete")
-    public ResponseEntity<?> deleteProduct(@Validated @RequestParam Integer productId){
-        if(productServiceImp.searchProduct(productId) == null){
+    public ResponseEntity<?> deleteProduct(@Validated @PathVariable Integer id){
+        if(productServiceImp.searchProduct(id) == null){
             return ResponseEntity.notFound().build();
         }
         else{
-            productServiceImp.deleteProduct(productId);
-            return ResponseEntity.ok().body("Product with id: "+productId+" has been ceased to exist.");
+            productServiceImp.deleteProduct(id);
+            return ResponseEntity.ok().body("Product with id: "+id+" has been ceased to exist.");
         }
     }
 }

@@ -1,6 +1,5 @@
 package model;
 import jakarta.validation.constraints.*;
-import java.time.LocalDateTime;
 
 
 public class Product {
@@ -24,11 +23,10 @@ public class Product {
     @Positive
     private Integer productQuantityStock;
     @Null
-    private LocalDateTime productCreationDate;
+    private String productCreationDate;
     @Null
-    private LocalDateTime productUpdateDate;
-    public Product(Integer productId, String productName, String productCategory, Float productPrice, String productExpirationDate, Integer productQuantityStock) {
-        this.productId = productId;
+    private String productUpdateDate;
+    public Product( String productName, String productCategory, Float productPrice, String productExpirationDate, Integer productQuantityStock) {
         this.productName = productName;
         this.productCategory = productCategory;
         this.productPrice = productPrice;
@@ -40,11 +38,11 @@ public class Product {
     }
 
 
-    public LocalDateTime getProductUpdateDate() {
+    public String getProductUpdateDate() {
         return productUpdateDate;
     }
 
-    public LocalDateTime getProductCreationDate() {
+    public String getProductCreationDate(String date) {
         return productCreationDate;
     }
 
@@ -96,11 +94,11 @@ public class Product {
         this.productQuantityStock = productQuantityStock;
     }
 
-    public void setProductCreationDate(LocalDateTime productCreationDate) {
+    public void setProductCreationDate(String productCreationDate) {
         this.productCreationDate = productCreationDate;
     }
 
-    public void setProductUpdateDate(LocalDateTime productUpdateDate) {
+    public void setProductUpdateDate(String productUpdateDate) {
         this.productUpdateDate = productUpdateDate;
     }
 
