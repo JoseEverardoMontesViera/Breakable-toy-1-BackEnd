@@ -1,13 +1,12 @@
 package services;
 import model.Product;
-import org.springframework.http.ResponseEntity;
+import model.Summary;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import model.Product;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class productServiceImp implements productService {
@@ -100,8 +99,53 @@ public class productServiceImp implements productService {
     }
 
     @Override
+    public List<String> getCategories() {
+        List<String> categories = new ArrayList<String>();
+        inventory.forEach(product -> {
+            if(categories.contains(product.getProductCategory())){
+
+            }
+            else{
+                categories.add(product.getProductCategory());
+            }
+        });
+        return categories;
+    }
+
+
+
+    @Override
     public List<Product> getFilteredProducts(String criteria) {
         return inventory.stream().filter(product -> Objects.equals(product.getProductCategory(), criteria)).toList();
+    }
+    @Override
+    public List<Summary> getSummary() {
+        List<String> categories = new ArrayList<String>();
+        List<Summary> summary = new ArrayList<Summary>();
+        inventory.forEach(product -> {
+            if(categories.contains(product.getProductCategory())){
+
+            }
+            else{
+                categories.add(product.getProductCategory());
+            }
+        });
+        categories.forEach(category-> {
+            AtomicReference<Float> totalProducts= new AtomicReference<>(0F);
+            AtomicReference<Float> totalValue= new AtomicReference<>(0F);
+            Float AveragePrice=0F;
+            inventory.forEach(product -> {
+                if(product.getProductCategory().equals(category)){
+                    totalProducts.updateAndGet(v -> v + 1F);
+                    totalValue.updateAndGet(v -> v + product.getProductPrice().floatValue());
+                }
+            });
+            AveragePrice = totalValue.get()/totalProducts.get();
+            Summary categorySummary = new Summary(category,totalProducts.get(),totalValue.get(),AveragePrice);
+            summary.add(categorySummary);
+
+        });
+        return summary;
     }
 
 }

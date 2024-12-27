@@ -138,6 +138,21 @@ class APITest {
             mockMvc.perform(delete("/products/1/delete").contentType(MediaType.APPLICATION_JSON)
                     )
                     .andExpect(status().isOk());
+        }@Test
+        public void searchProduct() throws Exception{
+            Product newProduct = new Product("Hat","Clothes",45.0F,"",777);
+            newProduct.setProductId(1);
+            Mockito.doReturn(newProduct).when(productService).searchProduct(1);
+            mockMvc.perform(get("/products/search/1").contentType(MediaType.APPLICATION_JSON)
+                    )
+                    .andExpect(status().isOk());
+        }@Test
+        public void getCategories() throws Exception{
+            List<String> arry = new ArrayList<String>();
+            Mockito.doReturn(arry).when(productService).getCategories();
+            mockMvc.perform(get("/products/Categories").contentType(MediaType.APPLICATION_JSON)
+                    )
+                    .andExpect(status().isOk());
         }
 
     }

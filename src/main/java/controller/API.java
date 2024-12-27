@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.google.gson.GsonBuilder;
 import lombok.*;
 import model.Product;
+import model.Summary;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,21 @@ public class API {
     @GetMapping("/products")
     public List<Product> getAllProducts(@RequestParam(required = false) String filter){
         return productServiceImp.getAllProducts();
+    }
+
+    @GetMapping("/products/Categories")
+    public List<String> getAllCategories(@RequestParam(required = false) String filter){
+        return productServiceImp.getCategories();
+    }
+
+    @GetMapping("/products/summary")
+    public List<Summary> getSummary(@RequestParam(required = false) String filter){
+        return productServiceImp.getSummary();
+    }
+
+    @GetMapping("/products/search/{id}")
+    public Product getProduct(@PathVariable Integer id){
+        return productServiceImp.searchProduct(id);
     }
 
     @PostMapping("/products")
