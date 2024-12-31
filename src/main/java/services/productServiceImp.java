@@ -12,10 +12,14 @@ import java.util.concurrent.atomic.AtomicReference;
 public class productServiceImp implements productService {
 
     public List<Product> inventory = new ArrayList<>();
+    Product product = new Product();
+    Product product2 = new Product();
+
 
     DateTimeFormatter formatter
             = DateTimeFormatter.ofPattern(
             "yyyy-MM-dd");
+
 
     @Override
     public Product addProducts(Product product) {
@@ -29,6 +33,7 @@ public class productServiceImp implements productService {
         String dateTimeString = now.format(formatter);
         product.setProductCreationDate(dateTimeString);
         product.setProductUpdateDate(dateTimeString);
+        System.out.println(product.getProductCreationDate());
         inventory.add(product);
         return product;
     }
@@ -92,6 +97,21 @@ public class productServiceImp implements productService {
         return true;
     }
 
+    @Override
+    public Boolean reStockANDOutofStockProduct(Integer productId) {
+        Product product = searchProduct(productId);
+        product.setProductQuantityStock(0);
+        if(product.getProductQuantityStock()==0){
+            product.setProductQuantityStock(10);
+            return true;
+        }
+        else if (product.getProductQuantityStock()!=0){
+            product.setProductQuantityStock(0);
+            return true;
+        }
+        return null;
+    }
+
 
     @Override
     public List<Product> getAllProducts() {
@@ -102,12 +122,15 @@ public class productServiceImp implements productService {
     public List<String> getCategories() {
         List<String> categories = new ArrayList<String>();
         inventory.forEach(product -> {
-            if(categories.contains(product.getProductCategory())){
+            product.getProductCategory().forEach(category->{
+                if(categories.contains(category)){
 
-            }
-            else{
-                categories.add(product.getProductCategory());
-            }
+                }
+                else{
+                    categories.add(category);
+                }
+            });
+
         });
         return categories;
     }
@@ -123,26 +146,32 @@ public class productServiceImp implements productService {
         List<String> categories = new ArrayList<String>();
         List<Summary> summary = new ArrayList<Summary>();
         inventory.forEach(product -> {
-            if(categories.contains(product.getProductCategory())){
+            product.getProductCategory().forEach(category->{
+                if(categories.contains(category)){
 
-            }
-            else{
-                categories.add(product.getProductCategory());
-            }
+                }
+                else{
+                    categories.add(category);
+                }
+            });
+
         });
         categories.forEach(category-> {
             AtomicReference<Float> totalProducts= new AtomicReference<>(0F);
             AtomicReference<Float> totalValue= new AtomicReference<>(0F);
             Float AveragePrice=0F;
             inventory.forEach(product -> {
-                if(product.getProductCategory().equals(category)){
-                    totalProducts.updateAndGet(v -> v + 1F);
+                if(product.getProductCategory().contains(category)){
+                    totalProducts.updateAndGet(v -> v + product.getProductQuantityStock().floatValue());
                     totalValue.updateAndGet(v -> v + product.getProductPrice().floatValue());
                 }
             });
             AveragePrice = totalValue.get()/totalProducts.get();
             Summary categorySummary = new Summary(category,totalProducts.get(),totalValue.get(),AveragePrice);
-            summary.add(categorySummary);
+            if(categorySummary.getTotalProducts()!=0){
+                summary.add(categorySummary);
+
+            }
 
         });
         return summary;

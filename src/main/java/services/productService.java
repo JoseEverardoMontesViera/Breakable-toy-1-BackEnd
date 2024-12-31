@@ -19,6 +19,7 @@ public interface productService {
     Boolean modifyProduct(Integer productId, Product uProduct);
     Boolean outOfStockProduct(Integer productId);
     Boolean reStockProduct(Integer productId);
+    Boolean reStockANDOutofStockProduct(Integer productId);
 
     List<Product> getAllProducts();
 
