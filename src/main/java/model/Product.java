@@ -1,6 +1,9 @@
 package model;
 import jakarta.validation.constraints.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Product {
     private Integer productId;
@@ -11,7 +14,7 @@ public class Product {
     private String productName;
     @NotNull
     @NotBlank
-    private String productCategory;
+    private ArrayList<String> productCategory;
     @NotNull
     @NotBlank
     @Positive
@@ -26,7 +29,7 @@ public class Product {
     private String productCreationDate;
     @Null
     private String productUpdateDate;
-    public Product( String productName, String productCategory, Float productPrice, String productExpirationDate, Integer productQuantityStock) {
+    public Product( String productName, ArrayList<String> productCategory, Float productPrice, String productExpirationDate, Integer productQuantityStock) {
         this.productName = productName;
         this.productCategory = productCategory;
         this.productPrice = productPrice;
@@ -42,7 +45,7 @@ public class Product {
         return productUpdateDate;
     }
 
-    public String getProductCreationDate(String date) {
+    public String getProductCreationDate( ) {
         return productCreationDate;
     }
 
@@ -58,7 +61,7 @@ public class Product {
         return productPrice;
     }
 
-    public String getProductCategory() {
+    public ArrayList<String> getProductCategory() {
         return productCategory;
     }
 
@@ -78,7 +81,7 @@ public class Product {
         this.productName = productName;
     }
 
-    public void setProductCategory(String productCategory) {
+    public void setProductCategory(ArrayList<String> productCategory) {
         this.productCategory = productCategory;
     }
 

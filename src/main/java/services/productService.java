@@ -1,6 +1,7 @@
 package services;
 
 import model.Product;
+import model.Summary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +19,13 @@ public interface productService {
     Boolean modifyProduct(Integer productId, Product uProduct);
     Boolean outOfStockProduct(Integer productId);
     Boolean reStockProduct(Integer productId);
+    Boolean reStockANDOutofStockProduct(Integer productId);
 
     List<Product> getAllProducts();
+
+    List<String> getCategories();
+
+    List<Summary> getSummary();
 
     List<Product> getFilteredProducts(String criteria);
 

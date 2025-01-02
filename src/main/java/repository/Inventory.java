@@ -7,4 +7,6 @@ import java.util.List;
 
 public class Inventory {
     public List<Product> inventory= new ArrayList<>();
+    private Product product = new Product();
+
 }

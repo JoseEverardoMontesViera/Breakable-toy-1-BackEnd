@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.google.gson.GsonBuilder;
 import lombok.*;
 import model.Product;
+import model.Summary;
 import org.apache.coyote.Response;
+import org.json.JSONArray;
+import org.json.JSONString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import services.productServiceImp;
 import com.google.gson.Gson;
 import org.json.JSONObject;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import model.Product;
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -35,13 +39,36 @@ public class API {
         return productServiceImp.getAllProducts();
     }
 
+    @GetMapping("/products/Categories")
+    public List<String> getAllCategories(@RequestParam(required = false) String filter){
+        return productServiceImp.getCategories();
+    }
+
+    @GetMapping("/products/summary")
+    public List<Summary> getSummary(@RequestParam(required = false) String filter){
+        return productServiceImp.getSummary();
+    }
+
+    @GetMapping("/products/search/{id}")
+    public Product getProduct(@PathVariable Integer id){
+        return productServiceImp.searchProduct(id);
+    }
+
     @PostMapping("/products")
     public ResponseEntity<?> postProduct(@RequestBody String newProduct){
+        System.out.println(newProduct);
 //        Product newProduct = new Product(0, productName, productCategory, productPrice, productExpirationDate, productQuantityStock);
         JSONObject json = new JSONObject(newProduct);
         Product addingProduct = new Product();
         addingProduct.setProductName(json.getString("productName"));
-        addingProduct.setProductCategory(json.getString("productCategory"));
+        JSONArray categories =json.getJSONArray("productCategory");
+        ArrayList<String> categoriesArray = new ArrayList<String>();
+        if (categories != null) {
+            for (int i=0;i<categories.length();i++){
+                categoriesArray.add(categories.getString(i));
+            }
+        }
+        addingProduct.setProductCategory(categoriesArray);
         addingProduct.setProductPrice(json.getFloat("productPrice"));
         if(json.getString("productExpirationDate")!=null){
             addingProduct.setProductExpirationDate(json.getString("productExpirationDate").toString());
@@ -64,7 +91,14 @@ public class API {
             System.out.println(json);
             Product addingProduct = new Product();
             addingProduct.setProductName(json.getString("productName"));
-            addingProduct.setProductCategory(json.getString("productCategory"));
+            JSONArray categories =json.getJSONArray("productCategory");
+            ArrayList<String> categoriesArray = new ArrayList<String>();
+            if (categories != null) {
+                for (int i=0;i<categories.length();i++){
+                    categoriesArray.add(categories.getString(i));
+                }
+            }
+            addingProduct.setProductCategory(categoriesArray);
             addingProduct.setProductPrice(json.getFloat("productPrice"));
             if(json.getString("productExpirationDate")!=null){
                 addingProduct.setProductExpirationDate(json.getString("productExpirationDate").toString());
@@ -101,6 +135,23 @@ public class API {
                 }
                 else{
                     return ResponseEntity.ok().body("That product already has a stock");
+                }
+            }
+
+    }@PutMapping("/products/{id}/inOrOutStock")
+    public ResponseEntity<?> inOrOutStockProduct(@Validated @PathVariable Integer id){
+            Product product = productServiceImp.searchProduct(id);
+            if(product == null){
+                return ResponseEntity.notFound().build();
+            }
+            else{
+                if (product.getProductQuantityStock()==0){
+                    productServiceImp.reStockANDOutofStockProduct(id);
+                    return ResponseEntity.ok().body("Product with id: "+id+" has been restocked.");
+                }
+                else{
+                    productServiceImp.reStockANDOutofStockProduct(id);
+                    return ResponseEntity.ok().body("Product with id: "+id+" has been marked as out of stock.");
                 }
             }
 

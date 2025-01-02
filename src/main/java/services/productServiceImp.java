@@ -1,22 +1,25 @@
 package services;
 import model.Product;
-import org.springframework.http.ResponseEntity;
+import model.Summary;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import model.Product;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class productServiceImp implements productService {
 
     public List<Product> inventory = new ArrayList<>();
+    Product product = new Product();
+    Product product2 = new Product();
+
 
     DateTimeFormatter formatter
             = DateTimeFormatter.ofPattern(
             "yyyy-MM-dd");
+
 
     @Override
     public Product addProducts(Product product) {
@@ -30,6 +33,7 @@ public class productServiceImp implements productService {
         String dateTimeString = now.format(formatter);
         product.setProductCreationDate(dateTimeString);
         product.setProductUpdateDate(dateTimeString);
+        System.out.println(product.getProductCreationDate());
         inventory.add(product);
         return product;
     }
@@ -93,6 +97,21 @@ public class productServiceImp implements productService {
         return true;
     }
 
+    @Override
+    public Boolean reStockANDOutofStockProduct(Integer productId) {
+        Product product = searchProduct(productId);
+        product.setProductQuantityStock(0);
+        if(product.getProductQuantityStock()==0){
+            product.setProductQuantityStock(10);
+            return true;
+        }
+        else if (product.getProductQuantityStock()!=0){
+            product.setProductQuantityStock(0);
+            return true;
+        }
+        return null;
+    }
+
 
     @Override
     public List<Product> getAllProducts() {
@@ -100,8 +119,76 @@ public class productServiceImp implements productService {
     }
 
     @Override
+    public List<String> getCategories() {
+        List<String> categories = new ArrayList<String>();
+        inventory.forEach(product -> {
+            product.getProductCategory().forEach(category->{
+                if(categories.contains(category)){
+
+                }
+                else{
+                    categories.add(category);
+                }
+            });
+
+        });
+        return categories;
+    }
+
+
+
+    @Override
     public List<Product> getFilteredProducts(String criteria) {
         return inventory.stream().filter(product -> Objects.equals(product.getProductCategory(), criteria)).toList();
+    }
+    @Override
+    public List<Summary> getSummary() {
+        List<String> categories = new ArrayList<String>();
+        List<Summary> summary = new ArrayList<Summary>();
+        inventory.forEach(product -> {
+            product.getProductCategory().forEach(category->{
+                if(categories.contains(category)){
+
+                }
+                else{
+                    categories.add(category);
+                }
+            });
+
+        });
+        categories.forEach(category-> {
+            AtomicReference<Float> totalProducts= new AtomicReference<>(0F);
+            AtomicReference<Float> totalValue= new AtomicReference<>(0F);
+            Float AveragePrice=0F;
+            inventory.forEach(product -> {
+                if(product.getProductCategory().contains(category)){
+                    totalProducts.updateAndGet(v -> v + product.getProductQuantityStock().floatValue());
+                    totalValue.updateAndGet(v -> v + product.getProductPrice().floatValue());
+                }
+            });
+            AveragePrice = totalValue.get()/totalProducts.get();
+            Summary categorySummary = new Summary(category,totalProducts.get(),totalValue.get(),AveragePrice);
+            if(categorySummary.getTotalProducts()!=0){
+                summary.add(categorySummary);
+
+            }
+
+        });
+        Summary overall = new Summary();
+        AtomicReference<Float> overallStock = new AtomicReference<>(0F);
+        AtomicReference<Float> overallValue = new AtomicReference<>(0F);
+        AtomicReference<Float> overallAverageValue = new AtomicReference<>(0F);
+        summary.forEach(category->{
+            overallStock.updateAndGet(v -> v + category.getTotalProducts().floatValue());
+            overallValue.updateAndGet(v -> v + category.getTotalValue().floatValue());
+            overallAverageValue.updateAndGet(v -> v + category.getAveragePrice().floatValue());
+        });
+        overall.setCategoryName("Overall");
+        overall.setTotalProducts(overallStock.get());
+        overall.setTotalValue(overallValue.get());
+        overall.setAveragePrice(overallAverageValue.get());
+        summary.add(overall);
+        return summary;
     }
 
 }
