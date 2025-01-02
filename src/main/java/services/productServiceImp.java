@@ -174,6 +174,20 @@ public class productServiceImp implements productService {
             }
 
         });
+        Summary overall = new Summary();
+        AtomicReference<Float> overallStock = new AtomicReference<>(0F);
+        AtomicReference<Float> overallValue = new AtomicReference<>(0F);
+        AtomicReference<Float> overallAverageValue = new AtomicReference<>(0F);
+        summary.forEach(category->{
+            overallStock.updateAndGet(v -> v + category.getTotalProducts().floatValue());
+            overallValue.updateAndGet(v -> v + category.getTotalValue().floatValue());
+            overallAverageValue.updateAndGet(v -> v + category.getAveragePrice().floatValue());
+        });
+        overall.setCategoryName("Overall");
+        overall.setTotalProducts(overallStock.get());
+        overall.setTotalValue(overallValue.get());
+        overall.setAveragePrice(overallAverageValue.get());
+        summary.add(overall);
         return summary;
     }
 
