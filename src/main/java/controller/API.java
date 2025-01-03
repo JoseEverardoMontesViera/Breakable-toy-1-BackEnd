@@ -156,7 +156,7 @@ public class API {
             }
 
     }
-    @DeleteMapping("/products/{id}/delete")
+        @DeleteMapping("/products/{id}/delete")
     public ResponseEntity<?> deleteProduct(@Validated @PathVariable Integer id){
         if(productServiceImp.searchProduct(id) == null){
             return ResponseEntity.notFound().build();
