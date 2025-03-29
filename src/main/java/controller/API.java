@@ -19,7 +19,11 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import model.Product;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -29,7 +33,7 @@ public class API {
     @Autowired
     private productServiceImp productServiceImp;
 
-    @GetMapping("/products/Hello")
+    @GetMapping("/")
     public ResponseEntity<?> home(){
         return ResponseEntity.ok().body("Hola mundo!");
     }
@@ -38,7 +42,72 @@ public class API {
     public List<Product> getAllProducts(@RequestParam(required = false) String filter){
         return productServiceImp.getAllProducts();
     }
+    //Get products paginated
+    //GET /products/paginated?page=1&size=20 example
+    @GetMapping("/products/paginated")
+    public ResponseEntity<Map<String, Object>> getPaginatedProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
+        List<Product> allProducts = productServiceImp.getAllProducts();
+
+        // Calcular los índices de paginación
+        int total = allProducts.size();
+        int fromIndex = Math.min(page * size, total);
+        int toIndex = Math.min(fromIndex + size, total);
+
+        // Obtener solo los productos de la página solicitada
+        List<Product> paginatedProducts = allProducts.subList(fromIndex, toIndex);
+
+        // Crear un objeto para devolver el resultado
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", paginatedProducts);
+        response.put("total", total); // Añadir el total de productos
+
+        return ResponseEntity.ok(response);
+    }
+    //Get products filtering them
+    //GET /products/search?name=Laptop&category=Electronics&inStock=true example how to us it
+    @GetMapping("/products/search")
+    public ResponseEntity<List<Product>> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) List<String> categories,
+            @RequestParam(required = false) Boolean inStock) {
+
+        List<Product> filteredProducts = productServiceImp.getAllProducts();
+
+        // Filtrar por nombre (búsqueda parcial)
+        if (name != null && !name.isEmpty()) {
+            filteredProducts = filteredProducts.stream()
+                    .filter(p -> p.getProductName().toLowerCase().contains(name.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        // Filtrar por una sola categoría
+        if (category != null) {
+            filteredProducts = filteredProducts.stream()
+                    .filter(p -> p.getProductCategory().contains(category))
+                    .collect(Collectors.toList());
+        }
+
+        // Filtrar por múltiples categorías
+        if (categories != null && !categories.isEmpty()) {
+            filteredProducts = filteredProducts.stream()
+                    .filter(p -> categories.stream().anyMatch(p.getProductCategory()::contains))
+                    .collect(Collectors.toList());
+        }
+
+        // Filtrar por stock (inStock=true o false)
+        if (inStock != null) {
+            filteredProducts = filteredProducts.stream()
+                    .filter(p -> (inStock && p.getProductQuantityStock() > 0) ||
+                            (!inStock && p.getProductQuantityStock() == 0))
+                    .collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok(filteredProducts);
+    }
     @GetMapping("/products/Categories")
     public List<String> getAllCategories(@RequestParam(required = false) String filter){
         return productServiceImp.getCategories();
@@ -159,10 +228,12 @@ public class API {
         @DeleteMapping("/products/{id}/delete")
     public ResponseEntity<?> deleteProduct(@Validated @PathVariable Integer id){
         if(productServiceImp.searchProduct(id) == null){
+            System.out.println(" null, nort deleted");
             return ResponseEntity.notFound().build();
         }
         else{
             productServiceImp.deleteProduct(id);
+            System.out.println("deleted");
             return ResponseEntity.ok().body("Product with id: "+id+" has been ceased to exist.");
         }
     }
